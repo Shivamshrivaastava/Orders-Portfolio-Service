@@ -1,108 +1,215 @@
 
-# Orders & Portfolio Service (TypeScript + Express + Prisma + Postgres)
+# 🧾 Orders & Portfolio Service (Final Version)
 
-A clean, modular implementation of the assignment with idempotent order creation, fills settlement,
-portfolio snapshot, mock quotes, and an in-memory event bus.
+## 🚀 Overview
+This service manages **orders, fills, and portfolios** for ETF-style trading.  
+Built with **TypeScript, Node.js, Express, and PostgreSQL (via Prisma ORM)**.  
+Supports idempotent order creation, real-time portfolio tracking, and domain events.
 
-## Features
-- **Idempotent** `POST /orders` via `Idempotency-Key` header (or `clientOrderId` fallback)
-- **Filtering & pagination** on `GET /orders`
-- **Fills settlement** `POST /fills` updates order status and positions atomically
-- **Portfolio snapshot** `GET /portfolio` with unrealized PnL (mock quotes)
-- **Mock quotes** with cache and `POST /quotes` override
-- **Structured logs** (pino), env config, normalized errors, Docker
-- **Tests** with Vitest + Supertest (idempotency & happy-path)
+---
 
-## Quickstart (Docker)
-```bash
-# 1) Build & run
-docker compose up --build
+## ⚙️ Features
+✅ Create and list buy/sell orders (idempotent)  
+✅ Apply fills and automatically update order status  
+✅ Maintain real-time portfolio positions and average cost  
+✅ Prevent overselling positions  
+✅ In-memory domain event bus for `order.created` and `fill.applied`  
+✅ Zod-based validation, clean modular structure, and Docker-ready  
 
-# API will be on http://localhost:3000
-```
+---
 
-## Quickstart (Local Dev)
-```bash
-# Requirements: Node.js 18+, Docker (for Postgres) or local Postgres
-
-# 1) Install deps
-npm install
-
-# 2) Start Postgres (Docker)
-docker run --name pg -e POSTGRES_USER=app -e POSTGRES_PASSWORD=app -e POSTGRES_DB=appdb -p 5432:5432 -d postgres:16-alpine
-
-# 3) Create .env
-cat > .env <<'ENV'
-DATABASE_URL=postgres://app:app@localhost:5432/appdb?schema=public
-PORT=3000
-LOG_LEVEL=debug
-ENV
-
-# 4) Generate client & migrate
-npx prisma generate
-npm run db:migrate -- --name init
-
-# 5) Run dev server
-npm run dev
-# => http://localhost:3000/health
-```
-
-## API Examples
-
-### Create Order (idempotent)
-```bash
-curl -X POST http://localhost:3000/orders \
-  -H 'Content-Type: application/json' \
-  -H 'Idempotency-Key: idem-123' \
-  -d '{"symbol":"BND","side":"buy","qty":120,"clientOrderId":"cli-20251010-0001"}'
-```
-
-### List Orders
-```bash
-curl 'http://localhost:3000/orders?page=1&pageSize=20&symbol=BND&status=filled&sort=createdAt:desc'
-```
-
-### Apply Fill
-```bash
-curl -X POST http://localhost:3000/fills \
-  -H 'Content-Type: application/json' \
-  -d '{"orderId":"<uuid>","price":73.5,"qty":100,"timestamp":"2025-10-10T09:00:00Z"}'
-```
-
-### Portfolio Snapshot
-```bash
-curl http://localhost:3000/portfolio
-```
-
-### Override Quote (tests/dev)
-```bash
-curl -X POST http://localhost:3000/quotes -H 'Content-Type: application/json' -d '{"symbol":"BND","price":73.8}'
-```
-
-## Project Structure
+## 📦 Folder Structure
 ```
 src/
-  app/            # server, routes
-  core/           # db, logging, errors, utils
-  modules/
-    events/       # in-memory event bus
-    orders/       # controller, service, repo, validators
-    fills/        # controller, service, repo
-    portfolio/    # controller, service
-    quotes/       # controller, service
-tests/            # vitest tests
-prisma/           # schema.prisma
+ ├── app/                # Express server, routes setup
+ ├── core/               # Common modules (db, logging, errors, utils)
+ ├── modules/
+ │    ├── orders/        # Orders logic (controller, service, repo)
+ │    ├── fills/         # Fills logic (controller, service)
+ │    ├── portfolio/     # Portfolio computation
+ │    ├── events/        # Event bus abstraction
+ │    └── quotes/        # Mock price feed
+ └── tests/              # Unit & integration tests
 ```
 
-## Notes & Trade-offs
-- Order statuses kept as strings to match the provided sketch.
-- Positions allow going negative (short) to keep logic simple when selling first.
-- Realized P&L intentionally ignored (not required).
-- Event bus is in-memory; can be upgraded to outbox pattern.
-- Sorting allowlist enforced on `GET /orders`.
+---
 
-## Running Tests
+## 🧰 Tech Stack
+- **Language**: TypeScript
+- **Framework**: Express.js
+- **Database**: PostgreSQL (via Prisma ORM)
+- **Validation**: Zod
+- **Logging**: Pino
+- **Testing**: Vitest / Jest
+- **Containerization**: Docker + docker-compose
+
+---
+
+## 🧩 Endpoints Summary
+
+### 1️⃣ Create Order
+**POST** `/orders`
+```json
+{
+  "symbol": "BND",
+  "side": "buy",
+  "qty": 100,
+  "clientOrderId": "cli-20251024-001"
+}
+```
+
+**Response**
+```json
+{
+  "id": "...",
+  "symbol": "BND",
+  "side": "buy",
+  "qty": 100,
+  "status": "pending",
+  "avgPrice": null
+}
+```
+
+---
+
+### 2️⃣ List Orders
+**GET** `/orders?page=1&pageSize=10&symbol=BND`
+
+**Response**
+```json
+{
+  "items": [...],
+  "page": 1,
+  "pageSize": 10,
+  "total": 3
+}
+```
+
+---
+
+### 3️⃣ Apply Fill
+**POST** `/fills`
+```json
+{
+  "orderId": "<uuid>",
+  "price": 80.0,
+  "qty": 10,
+  "timestamp": "2025-10-24T07:45:00Z"
+}
+```
+
+**Response**
+```json
+{
+  "order": {
+    "id": "...",
+    "symbol": "BND",
+    "side": "sell",
+    "qty": 10,
+    "status": "filled",
+    "avgPrice": 80.0
+  },
+  "latestFill": {
+    "price": 80.0,
+    "qty": 10,
+    "timestamp": "2025-10-24T07:45:00.000Z"
+  }
+}
+```
+
+---
+
+### 4️⃣ Get Portfolio
+**GET** `/portfolio`
+
+**Response**
+```json
+{
+  "positions": [
+    { "symbol": "BND", "qty": 90, "avgCost": 73.6, "unrealizedPnL": 540 }
+  ],
+  "totals": { "value": 6624.0, "pnl": 540 }
+}
+```
+
+---
+
+## 🪄 Environment Setup
+
+### Create `.env`
+```
+NODE_ENV=development
+PORT=3000
+DATABASE_URL=postgresql://<user>:<password>@<host>/<db>?sslmode=require
+LOG_LEVEL=info
+```
+
+If you’re using **Neon.tech**:
+```
+DATABASE_URL=postgresql://neondb_owner:your_password@your-neon-host/neondb?sslmode=require
+```
+
+---
+
+## 🐳 Run with Docker
 ```bash
-# Set DATABASE_URL to a test database, then:
+docker compose up --build
+```
+
+Or manually start Postgres:
+```bash
+docker run --name pg -e POSTGRES_USER=app -e POSTGRES_PASSWORD=app -e POSTGRES_DB=appdb -p 5432:5432 -d postgres:16-alpine
+```
+
+Then run the app:
+```bash
+npm install
+npm run dev
+```
+
+---
+
+## 🧪 Testing
+Run unit tests:
+```bash
 npm test
 ```
+
+Run integration tests:
+```bash
+npm run test:watch
+```
+
+---
+
+## 🧠 Key Business Logic
+### Order Lifecycle
+`pending → partially_filled → filled`  
+Optional: `cancelled` or `rejected` via `PATCH /orders/:id`.
+
+### Idempotency
+Orders are unique by `clientOrderId`.  
+Reusing the same ID returns the same response.  
+Conflicting payloads → `409 Conflict`.
+
+### Portfolio Updates
+- **BUY:** Increases quantity, recalculates average cost.  
+- **SELL:** Decreases quantity, retains average cost.  
+- Prevents overselling beyond held quantity.
+
+---
+
+## 📜 Domain Events
+Events are emitted via an in-memory queue:
+- `order.created`
+- `fill.applied`
+
+You can log or subscribe to them for analytics or outbox dispatch.
+
+---
+
+## 📚 License
+© 2025 Shivam Shrivastava
+
+---
+

@@ -1,26 +1,14 @@
-
 version: '3.9'
+
 services:
-  db:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
-      POSTGRES_DB: appdb
-    ports:
-      - "5432:5432"
-    volumes:
-      - dbdata:/var/lib/postgresql/data
   app:
     build: .
+    container_name: orders-portfolio-service
     environment:
-      DATABASE_URL: postgres://app:app@db:5432/appdb?schema=public
+      DATABASE_URL: postgresql://neondb_owner:npg_hQpKZfIiL46U@ep-sweet-hall-a1kade91-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
       PORT: 3000
-      LOG_LEVEL: info
+      LOG_LEVEL: debug
       NODE_ENV: production
-    depends_on:
-      - db
     ports:
       - "3000:3000"
-volumes:
-  dbdata:
+    restart: always
