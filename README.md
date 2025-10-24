@@ -1,5 +1,5 @@
 
-# 🧾 Orders & Portfolio Service (Final Version)
+# 🧾 Orders & Portfolio Service 
 
 ## 🚀 Overview
 This service manages **orders, fills, and portfolios** for ETF-style trading.  
@@ -7,6 +7,7 @@ Built with **TypeScript, Node.js, Express, and PostgreSQL (via Prisma ORM)**.
 Supports idempotent order creation, real-time portfolio tracking, and domain events.
 
 ---
+# project live at - https://orders-portfolio-service-cjtwy.sevalla.app
 
 ## ⚙️ Features
 ✅ Create and list buy/sell orders (idempotent)  
