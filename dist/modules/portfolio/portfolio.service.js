@@ -1,5 +1,5 @@
-import { prisma } from '../../core/db/prisma';
-import { quotesService } from '../quotes/quotes.service';
+import { prisma } from '../../core/db/prisma.js';
+import { quotesService } from '../quotes/quotes.service.js';
 export const portfolioService = {
     async snapshot() {
         const positions = await prisma.position.findMany();

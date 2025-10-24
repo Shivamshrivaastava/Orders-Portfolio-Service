@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import crypto from 'crypto';
-import { prisma } from '../../core/db/prisma';
-import { AppError } from '../../core/errors/AppError';
-import { eventBus } from '../events/eventBus';
+import { prisma } from '../../core/db/prisma.js';
+import { AppError } from '../../core/errors/AppError.js';
+import { eventBus } from '../events/eventBus.js';
 export const ordersService = {
     async create(input) {
         //  Compute unique idempotency key hash (based on clientOrderId or header)

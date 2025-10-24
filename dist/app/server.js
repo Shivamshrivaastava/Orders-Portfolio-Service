@@ -1,8 +1,9 @@
+/* eslint-disable no-undef */
 import express from 'express';
-import { logger } from '../core/logging/logger';
-import fillsRouter from '../modules/fills/fill.controller';
-import ordersRouter from '../modules/orders/order.controller';
-import portfolioRouter from '../modules/portfolio/portfolio.controller';
+import { logger } from '../core/logging/logger.js';
+import fillsRouter from '../modules/fills/fill.controller.js';
+import ordersRouter from '../modules/orders/order.controller.js';
+import portfolioRouter from '../modules/portfolio/portfolio.controller.js';
 const app = express();
 // Middleware
 app.use(express.json());

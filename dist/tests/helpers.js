@@ -1,4 +1,4 @@
-import { prisma } from '../core/db/prisma';
+import { prisma } from '../core/db/prisma.js';
 export async function resetDb() {
     await prisma.$transaction([
         prisma.fill.deleteMany(),

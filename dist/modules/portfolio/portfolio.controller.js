@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { portfolioService } from './portfolio.service';
+import { portfolioService } from './portfolio.service.js';
 const router = Router();
 router.get('/portfolio', async (_req, res, next) => {
     try {

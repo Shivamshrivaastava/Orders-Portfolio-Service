@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AppError } from './AppError';
+import { AppError } from './AppError.js';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function errorMiddleware(err, _req, res, _next) {
     if (err instanceof AppError) {

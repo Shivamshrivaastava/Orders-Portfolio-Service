@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import app from '../app/server';
-import { prisma } from '../core/db/prisma';
-import { resetDb } from './helpers';
+import app from '../app/server.js';
+import { prisma } from '../core/db/prisma.js';
+import { resetDb } from './helpers.js';
 describe('Happy path: create order -> partial fill -> full fill -> portfolio', () => {
     beforeAll(async () => { await prisma.$connect(); });
     afterAll(async () => { await prisma.$disconnect(); });

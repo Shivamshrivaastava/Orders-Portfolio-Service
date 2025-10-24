@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { prisma } from '../../core/db/prisma';
+import { prisma } from '../../core/db/prisma.js';
 export const orderRepo = {
     create(data) {
         return prisma.order.create({ data: { ...data, status: 'pending', avgPrice: null } });

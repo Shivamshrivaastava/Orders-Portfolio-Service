@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { parsePagination } from '../../core/utils/pagination';
-import { orderRepo } from './order.repo';
-import { ordersService } from './order.service';
-import { createOrderSchema, listOrdersSchema } from './order.validators';
+import { parsePagination } from '../../core/utils/pagination.js';
+import { orderRepo } from './order.repo.js';
+import { ordersService } from './order.service.js';
+import { createOrderSchema, listOrdersSchema } from './order.validators.js';
 const router = Router();
 router.post('/orders', async (req, res, next) => {
     try {

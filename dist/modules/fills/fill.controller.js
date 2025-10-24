@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { fillsService } from './fill.service';
-import { applyFillSchema } from './fill.validators';
+import { fillsService } from './fill.service.js';
+import { applyFillSchema } from './fill.validators.js';
 const router = Router();
 router.post('/fills', async (req, res, next) => {
     try {

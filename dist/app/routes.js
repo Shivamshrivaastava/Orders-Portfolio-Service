@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import fillsRouter from '../modules/fills/fill.controller';
-import ordersRouter from '../modules/orders/order.controller';
-import portfolioRouter from '../modules/portfolio/portfolio.controller';
-import quotesRouter from '../modules/quotes/quotes.controller';
+import fillsRouter from '../modules/fills/fill.controller.js';
+import ordersRouter from '../modules/orders/order.controller.js';
+import portfolioRouter from '../modules/portfolio/portfolio.controller.js';
+import quotesRouter from '../modules/quotes/quotes.controller.js';
 const router = Router();
 router.use(ordersRouter);
 router.use(fillsRouter);

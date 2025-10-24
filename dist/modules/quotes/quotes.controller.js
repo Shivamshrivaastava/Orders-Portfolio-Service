@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { z } from 'zod';
-import { quotesService } from './quotes.service';
+import { quotesService } from './quotes.service.js';
 const router = Router();
 const bodySchema = z.object({ symbol: z.string().min(1), price: z.number().positive() });
 router.post('/quotes', (req, res, next) => {

@@ -1,6 +1,6 @@
-import { prisma } from '../../core/db/prisma';
-import { AppError } from '../../core/errors/AppError';
-import { eventBus } from '../events/eventBus';
+import { prisma } from '../../core/db/prisma.js';
+import { AppError } from '../../core/errors/AppError.js';
+import { eventBus } from '../events/eventBus.js';
 export const fillsService = {
     async applyFill(input) {
         await prisma.$transaction(async (tx) => {
