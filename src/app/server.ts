@@ -1,28 +1,34 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import 'dotenv/config';
-import cors from 'cors';
 import express from 'express';
-import helmet from 'helmet';
-import pinoHttp from 'pino-http';
-import { errorMiddleware } from '../core/errors/errorMiddleware';
 import { logger } from '../core/logging/logger';
-import routes from './routes';
+import fillsRouter from '../modules/fills/fill.controller';
+import ordersRouter from '../modules/orders/order.controller';
+import portfolioRouter from '../modules/portfolio/portfolio.controller';
 
 const app = express();
-app.use(helmet());
-app.use(cors());
-app.use(express.json({ limit: '1mb' }));
-app.use(pinoHttp({ logger: logger as any }));
 
+// Middleware
+app.use(express.json());
 
-app.get('/health', (_req, res) => res.json({ ok: true }));
-app.use(routes);
-app.use(errorMiddleware);
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
+// Root Route
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Welcome to Orders & Portfolio Service API' });
+});
+
+// Feature Routes
+app.use(ordersRouter);
+app.use(fillsRouter);
+app.use(portfolioRouter);
+
+// Start the Server
 const port = Number(process.env.PORT || 3000);
+
 app.listen(port, () => {
-  logger.info({ port }, 'Orders & Portfolio service listening');
+  logger.info({ port }, `🚀 Orders & Portfolio Service running on port ${port}`);
 });
 
 export default app;
