@@ -1,0 +1,26 @@
+
+version: '3.9'
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: appdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgres://app:app@db:5432/appdb?schema=public
+      PORT: 3000
+      LOG_LEVEL: info
+      NODE_ENV: production
+    depends_on:
+      - db
+    ports:
+      - "3000:3000"
+volumes:
+  dbdata:
