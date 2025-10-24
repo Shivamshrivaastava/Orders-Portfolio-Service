@@ -22,7 +22,11 @@ router.get('/orders', async (req, res, next) => {
     const q = listOrdersSchema.parse(req.query);
     const { page, pageSize } = parsePagination(q);
     const skip = (page - 1) * pageSize;
-    const [total, items] = await orderRepo.list({ skip, take: pageSize, symbol: q.symbol?.toUpperCase(), status: q.status, from: q.from, to: q.to, sort: q.sort });
+    const [total, items] = await orderRepo.list({
+      skip, take: pageSize,
+      symbol: q.symbol?.toUpperCase(), status: q.status,
+      from: q.from, to: q.to, sort: q.sort
+    });
     res.json({ items, page, pageSize, total });
   } catch (e) { next(e); }
 });
